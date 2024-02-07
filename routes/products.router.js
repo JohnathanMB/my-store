@@ -12,14 +12,15 @@ router.get('/filter', (req, res) => {
   res.send('Yo soy un filtro')
 })
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req, res, next) => {
 
   try {
     const { id } = req.params;
     const product = await service.findOne(id);
     return res.json(product);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    //Hacemos uso de forma explicita los middleware de error;
+    next(error);
   }
 
 });
