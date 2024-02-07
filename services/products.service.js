@@ -1,4 +1,4 @@
-const { faker } = require('@faker-js/faker')
+const { faker, fa } = require('@faker-js/faker')
 
 class ProductsService {
 
@@ -20,8 +20,14 @@ class ProductsService {
     }
   }
 
-  create() {
+  create(data) {
+    const newProduct = {
+      id: faker.string.uuid(),
+      ...data
+    };
 
+    this.products.push(newProduct);
+    return newProduct;
   }
 
   find() {
