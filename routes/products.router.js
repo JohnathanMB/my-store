@@ -36,10 +36,11 @@ router.patch('/:id', (req, res) => {
   const { id } = req.params;
   const body = req.body;
 
+  const product = service.update(id, body);
+
   res.json({
     message: 'update',
-    data: body,
-    id
+    data: product
   })
 
 })
@@ -47,10 +48,11 @@ router.patch('/:id', (req, res) => {
 router.delete('/:id', (req, res) => {
 
   const { id } = req.params;
+  const productId = service.delete(id);
 
   res.json({
     message: 'delete',
-    id
+    productId
   })
 
 })
