@@ -13,4 +13,16 @@ function errorHandler(err, req, res, next){
   })
 }
 
-module.exports = { logErrors, errorHandler }
+//Este majerará los errores de BOOM
+function boomErrorHandler(err, req, res, next){
+  if(err.isBoom){
+    const { output } = err;
+    res.status(output.statusCode).json(output.payload)
+  }else{
+    //este es necesario para evitar el error:
+    //"Cannot set headers after they are sent to the client"
+    next(err);
+  }
+}
+
+module.exports = { logErrors, errorHandler, boomErrorHandler }
