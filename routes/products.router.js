@@ -4,26 +4,30 @@ const ProductsService = require("./../services/products.service");
 const router = express.Router();
 const service = new ProductsService();
 
-router.get('/', (req, res) => {
-  res.status(200).json(service.find())
+router.get('/', async (req, res) => {
+  res.status(200).json(await service.find())
 });
 
 router.get('/filter', (req, res) => {
   res.send('Yo soy un filtro')
 })
 
-router.get('/:id', (req, res) => {
-  const { id } = req.params;
-  const product = service.findOne(id);
+router.get('/:id', async (req, res) => {
 
-  return validResponse(res, product);
+  try {
+    const { id } = req.params;
+    const product = await service.findOne(id);
+    return res.json(product);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+
 });
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
+
   const body = req.body;
-
-  const newProduct = service.create(body);
-
+  const newProduct = await service.create(body);
   res.status(201).json({
     message: "Created",
     data: newProduct
@@ -31,24 +35,27 @@ router.post('/', (req, res) => {
 
 })
 
-router.patch('/:id', (req, res) => {
+router.patch('/:id', async (req, res) => {
 
-  const { id } = req.params;
-  const body = req.body;
+  try {
+    const { id } = req.params;
+    const body = req.body;
+    const product = await service.update(id, body);
+    res.json({
+      message: 'update',
+      data: product
+    })
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
 
-  const product = service.update(id, body);
-
-  res.json({
-    message: 'update',
-    data: product
-  })
 
 })
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
 
   const { id } = req.params;
-  const productId = service.delete(id);
+  const productId = await service.delete(id);
 
   res.json({
     message: 'delete',
@@ -56,13 +63,5 @@ router.delete('/:id', (req, res) => {
   })
 
 })
-
-function validResponse(res, responseToValid){
-  const response = ((responseToValid != null)
-    ? res.json(responseToValid)
-    : res.status(404).json({ message: "Not Found" })
-  );
-  return response;
-}
 
 module.exports = router;
