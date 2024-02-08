@@ -36,7 +36,7 @@ router.post('/', async (req, res) => {
 
 })
 
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', async (req, res, next) => {
 
   try {
     const { id } = req.params;
@@ -47,21 +47,25 @@ router.patch('/:id', async (req, res) => {
       data: product
     })
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    next(error);
   }
 
 
 })
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', async (req, res, next) => {
 
-  const { id } = req.params;
-  const productId = await service.delete(id);
+  try {
+    const { id } = req.params;
+    const productId = await service.delete(id);
 
-  res.json({
-    message: 'delete',
-    productId
-  })
+    res.json({
+      message: 'delete',
+      productId
+    })
+  } catch (error) {
+    next(error);
+  }
 
 })
 

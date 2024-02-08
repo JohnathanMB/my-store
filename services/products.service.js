@@ -16,7 +16,8 @@ class ProductsService {
         id: ""+index,
         name: faker.commerce.productName(),
         price: parseInt(faker.commerce.price(), 10),
-        image: faker.image.url()
+        image: faker.image.url(),
+        isBlock: faker.datatype.boolean()
       });
     }
   }
@@ -35,7 +36,7 @@ class ProductsService {
     return new Promise((resolve, reject) => {
       setTimeout(()=>{
         resolve(this.products)
-      }, 5000)
+      }, 2000)
     });
   }
 
@@ -44,6 +45,10 @@ class ProductsService {
     if (!product) {
       throw boom.notFound("Product Not Found");
     }
+    if (product.isBlock){
+      throw boom.conflict("Product is blocked")
+    }
+
     return product;
   }
 
