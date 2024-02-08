@@ -78,6 +78,7 @@ router.post('/',
   createProduct)
 
 router.patch('/:id',
+  validatorHandler(getByIdProductSchema, 'params'),
   validatorHandler(updateProductSchema, 'body'),
   updateProduct)
 
