@@ -16,7 +16,7 @@ const whitlist = [
 
 const options = {
   origin: (origin, callback) => {
-    if(whitlist.includes(origin)) {
+    if(whitlist.includes(origin) || !origin) {
       callback(null, true);
     }else{
       callback(new Error('No permitido'))
