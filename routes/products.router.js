@@ -1,19 +1,18 @@
 const express = require('express');
 const ProductsService = require("./../services/products.service");
+const validatorHandler = require('./../middlewares/validator.handler');
+const { createProductSchema, updateProductSchema, getByIdProductSchema } = require('./../schemas/product.schema');
 
 const router = express.Router();
 const service = new ProductsService();
 
-router.get('/', async (req, res) => {
-  res.status(200).json(await service.find())
-});
 
-router.get('/filter', (req, res) => {
-  res.send('Yo soy un filtro')
-})
 
-router.get('/:id', async (req, res, next) => {
+const getAll = async (req, res) => {
+  res.status(200).json(await service.find());
+};
 
+const getById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const product = await service.findOne(id);
@@ -22,11 +21,9 @@ router.get('/:id', async (req, res, next) => {
     //Hacemos uso de forma explicita los middleware de error;
     next(error);
   }
+};
 
-});
-
-router.post('/', async (req, res) => {
-
+const createProduct = async (req, res) => {
   const body = req.body;
   const newProduct = await service.create(body);
   res.status(201).json({
@@ -34,10 +31,9 @@ router.post('/', async (req, res) => {
     data: newProduct
   });
 
-})
+};
 
-router.patch('/:id', async (req, res, next) => {
-
+const updateProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
     const body = req.body;
@@ -45,15 +41,13 @@ router.patch('/:id', async (req, res, next) => {
     res.json({
       message: 'update',
       data: product
-    })
+    });
   } catch (error) {
     next(error);
   }
+};
 
-
-})
-
-router.delete('/:id', async (req, res, next) => {
+const deleteProduct = async (req, res, next) => {
 
   try {
     const { id } = req.params;
@@ -62,11 +56,33 @@ router.delete('/:id', async (req, res, next) => {
     res.json({
       message: 'delete',
       productId
-    })
+    });
   } catch (error) {
     next(error);
   }
 
+};
+
+router.get('/', getAll);
+
+router.get('/filter', (req, res) => {
+  res.send('Yo soy un filtro')
 })
+
+router.get('/:id',
+  validatorHandler(getByIdProductSchema, 'params'),
+  getById);
+
+router.post('/',
+  validatorHandler(createProductSchema, 'body'),
+  createProduct)
+
+router.patch('/:id',
+  validatorHandler(updateProductSchema, 'body'),
+  updateProduct)
+
+router.delete('/:id',
+  validatorHandler(getByIdProductSchema, 'params'),
+  deleteProduct)
 
 module.exports = router;
