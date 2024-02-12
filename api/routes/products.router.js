@@ -6,8 +6,6 @@ const { createProductSchema, updateProductSchema, getByIdProductSchema } = requi
 const router = express.Router();
 const service = new ProductsService();
 
-
-
 const getAll = async (req, res) => {
   res.status(200).json(await service.find());
 };

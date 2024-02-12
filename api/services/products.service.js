@@ -1,48 +1,27 @@
 const { faker } = require('@faker-js/faker')
 const boom = require('@hapi/boom')
+const ProductModel = require('./../models/product.model');
 
 class ProductsService {
 
-  constructor() {
-    this.products = [];
-    this.generate();
-  }
-
-  generate() {
-    const size = 100;
-
-    for (let index = 1; index <= size; index++) {
-      this.products.push({
-        id: ""+index,
-        name: faker.commerce.productName(),
-        price: parseInt(faker.commerce.price(), 10),
-        image: faker.image.url(),
-        isBlock: faker.datatype.boolean()
-      });
-    }
-  }
-
   async create(data) {
-    const newProduct = {
-      id: faker.string.uuid(),
-      ...data
-    };
 
-    this.products.push(newProduct);
-    return newProduct;
+    const product = new ProductModel({
+      _id: faker.string.uuid(),
+      ...data
+    })
+
+    return await product.save();
   }
 
   async find() {
-    return new Promise((resolve, reject) => {
-      setTimeout(()=>{
-        resolve(this.products)
-      }, 2000)
-    });
+    return ProductModel.find();
   }
 
   async findOne(id) {
-    const product = this.products.find(item => item.id == id);
-    if (!product) {
+    ProductModel.findOne
+    const product = await ProductModel.findById(id);
+    if (Object.is(product, null)) {
       throw boom.notFound("Product Not Found");
     }
     if (product.isBlock){
@@ -53,28 +32,23 @@ class ProductsService {
   }
 
   async update(id, changes) {
-    const index = this.products.findIndex(item => item.id === id);
-    if (index === -1 ) {
+    const updated = await ProductModel.findByIdAndUpdate(id, {$set: changes})
+
+    if (updated === null ) {
       throw boom.notFound("Product Not Found");
     }
 
-    const product = this.products[index];
-    this.products[index] = {
-      ...product,
-      ...changes
-    };
-
-    return this.products[index];
+    return updated;
   }
 
-  delete(id) {
-    const index = this.products.findIndex(item => item.id === id);
-    if (index === -1 ) {
+  async delete(id) {
+    const deleted = await ProductModel.findByIdAndDelete(id);
+
+    if (deleted === null ) {
       throw boom.notFound("Product Not Found");
     }
 
-    this.products.splice(index, 1);
-    return { id };
+    return deleted;
   }
 
 }

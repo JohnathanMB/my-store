@@ -1,5 +1,6 @@
 const express = require('express');
 const cosrs = require('cors');
+const mongoose = require('mongoose');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -37,6 +38,12 @@ routerApi(app);
 app.use(logErrors);
 app.use(boomErrorHandler);
 app.use(errorHandler);
+
+mongoose.connect('mongodb://localhost:27017/node-example',).then(() => {
+  console.log('Conexión exitosa a MongoDB');
+}).catch(error => {
+  console.error('Error de conexión:', error);
+});
 
 app.listen(port, () => {
   console.log('Port: '+ port)
